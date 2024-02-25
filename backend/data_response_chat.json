@@ -1,0 +1,26 @@
+{
+  "response":[
+    {
+      "nama_panjang"        : ["Risky Manuel kikikokok kiki S.Ars s.dss s.a s.komm haha"] ,
+      "panggilan"           : ["Kalau dirumah biasa dipanggil kokok", "Kalau diluar biasa dipanggil ki", "Kalau orang baru biasanya lebih enjoy manggil ki haha", "kiki"] ,
+      "alamat_rumah"        : ["Karawang", "Yang deket jembatan sebelah kanan itu lho", "warung intinya, taukan?, google map cobaa!"] ,
+      "agama"               : ["Khatolik dongss", "Katolik"],
+      "status"              : ["Single sampai punya penghasilan banyak.. aamiin", "Jomblo sampe kaya dulu"],
+      "hobi"                : ["basket lahh (kadang futsal juga)", "Makan Soto", "Jogging"],
+      "adik"                : ["inisial S haha"],
+
+      "kuliah"              : ["tettt teetttt Sensor guys hahah tamatan SMK doang"],
+      "lahir"               : ["Cianjur", "Sekitar Bandung deh.."],
+      "kapan_nikah"         : ["Ga bakal nikah sebelum nge bahagia in MAMA", "Jangan kepoo teruss ahh..."],
+      "ciri_jodoh"          : ["Seiman intinya, Katolik dari lahir dianya", "Kalau bisa punya skill", "punya skill di internet khususnya", "realita aja yah skill lebih utama kalau untuk Risky mah apalagi kedepaanya teknologi makin canggih"],
+      "sembada"             : ["Artinya Sehat, Elok dan Edi"] ,
+      "pemrograman"         : ["javascript", "Apa hayoo bahasa yang termasuk bisa berjalan disisi server dan client"] ,
+      "pacar"               : ["dari lahir belum pernah pacaran", "Tergantung! kalau punya skill ya ayokk tapi biasanya susah bangettt", "Hidup ini bukan tentang ngasal cari pacar/pasangan intinya punya skill di utamain"],
+      "ku"                  : ["pikir sendiri xD", "Apa ya, kenalan dong hehe"],
+
+      "sapaan"              : ["Hayy", "Hay hayyy", "Hm.", "Hiiii !!"],
+      "jawab_salam"         : ["Mantabbb, mau tanya apa nih seputar informasiku?","Puji Tuhan, mau tanya apa nih seputar informasiku?"],
+      "bingung"             : ["Coba Perintah ini", "nama_panjang", "Apa ya, maaf aku bingung ahaha", "Ciyuss ni aku bingung", "Maaf ya atas keterbatasanku, aku gapaham maksudmu :(", "Maaf pertanyaanmu gabisa ku jawab :("]
+    }
+  ]
+}

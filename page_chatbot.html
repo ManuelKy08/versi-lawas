@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="frontend/chatbot.css">
+  </head>
+  <body>
+
+    <div class="container app">
+      <div class="row app-one">
+        <div class="col-sm-12 conversation">
+          <div class="row heading">
+            <div class="col-sm-2 col-md-1 col-xs-3 heading-avatar">
+              <div class="heading-avatar-icon">
+                <img src="media/img/user-photo.jpg">
+              </div>
+            </div>
+            <div class="col-sm-8 col-xs-7 heading-name">
+              <a class="heading-name-meta pull-left">This is me<br>
+                <div style="font-size:9.5px;color:rgb(0, 0, 0)">
+                  Online
+                </div>
+              </a>
+
+            </div>
+            <!-- <div class="col-sm-1 col-xs-1 heading-dot pull-right">
+              <i class="fa fa-ellipsis-v fa-2x  pull-right" aria-hidden="true"></i>
+            </div> -->
+          </div>
+
+          <div class="row message" id="conversation">
+            <div class="row message-previous">
+              <div class="col-sm-12 previous">
+                <!-- <a onclick="previous(this)" id="ankitjain28" name="20">
+                Show Previous Message!
+                </a> -->
+              </div>
+            </div>
+          </div>
+
+          <div class="row reply">
+            <div class="col-sm-1 col-xs-1 reply-emojis">
+              <!-- <i class="fa fa-smile-o fa-2x pull-right"></i> -->
+            </div>
+            <div class="col-sm-9 col-xs-9 reply-main">
+              <input placeholder="Tanyakan sesuatu tentang diriku.." id="chat-typing" class="form-control" rows="1"></input>
+            </div>
+            <div class="col-sm-2 col-xs-2 reply-send">
+              <button id="chat-sending" type="button">
+                <i class="fa fa-send fa-2x" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        window.onbeforeunload = function() { return 0; };
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
+        // let dataTimezone = $.ajax({type: "GET", url: "//api.timezonedb.com/v2.1/get-time-zone?key=21TZ0ZYZ0WCL&format=json&by=zone&zone=Asia/Jakarta", async: false}).responseJSON;
+        // let minuteAndSecond = dataTimezone.formatted.match(/\d\d:\d\d/gi)[0]
+        // let abbreviation = dataTimezone.abbreviation
+        let minuteAndSecond = `--:--`
+        let abbreviation = `WIB`
+
+        $('#conversation').append('<img class="load-chat" src="media/img/chat-load.gif">');
+        start()
+
+        $("input[name*='isi_pesan_chat_pengguna']").keypress(function(e) {
+          if(e.which == 13) {
+            e.preventDefault();
+            submit();
+          }
+        });
+
+        $('#chat-sending').on('click', function(event) {
+          event.preventDefault();
+          submit();
+        });
+
+        function submit () {
+          let message = $("#chat-typing").val();
+          if (message.match(/(\<.+\>.+<\/.+\>|\<.+\><\/.+\>)/g)) { return alert('Proses kamu tidak dapat dipenuhi!'); start(); }
+          if(message.trim() == ''){ return false; }
+          else {
+            $('#conversation').append(`
+              <div class="row message-body">
+                <div class="col-sm-12 message-main-sender">
+                  <div class="sender">
+                    <div class="message-text">
+                      ${message}
+                    </div>
+                    <span class="message-time pull-right">
+                      ${minuteAndSecond} ${abbreviation}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            `);
+            $('#conversation').append('<img class="load-chat" src="media/img/chat-load.gif">');
+            $('#chat-sending').attr("disabled", true);
+            $("#conversation").animate({scrollTop: $('#conversation').get(0).scrollHeight}, 1000);
+            setTimeout(function(){
+              $('#chat-sending').attr("disabled", false);
+              $('#chat-typing').val(null);
+              $('.load-chat').hide();
+              response(message);
+            },1900);
+          }
+        }
+
+        function response (message) {
+          $.getJSON("backend/data/question-and-answer/1.pertanyaan.json", function(data){
+
+            let data_token = tokenize (message)
+            let data_escape_special_character = escape_special_character (data_token)
+            let data_stopword = stopWord (data_escape_special_character)
+            let data_stemming_0 = stemming_0 (data_stopword)
+            let data_stemming_1 = stemming_1 (data_stemming_0)
+            let data_correction = correction (data_stemming_1)
+            let data_lemmatization = lemmatization (data_correction)
+            let data_analyzing = analyzing (message, data_lemmatization)
+
+            let no = 0;
+            for (var i = 0; i < Object.values(data_analyzing.data).length; i++) {
+              no++
+              $('#conversation').append(`
+                <div class="row message-body">
+                  <div class="col-sm-12 message-main-receiver">
+                    <div class="receiver">
+                      <div class="message-text">
+                        ${data_analyzing.data[Object.keys(responseData.data)[i]]}
+                      </div>
+                      <span class="message-time pull-right">
+                        ${minuteAndSecond} ${abbreviation}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              `);
+            }
+          });
+        }
+
+        // filtering
+        function tokenize (messages) {
+          let token = messages.split(" ");
+          let new_token = [];
+          for (var i = 0; i < token.length; i++) {
+            if (token[i].endsWith("mu") || token[i].endsWith("?") || token[i].endsWith("!")) { new_token.push(token[i].replace(/mu/g, "")); }
+            else if (token[i].endsWith("?")) { new_token.push(token[i].replace(/\?/g, "")); }
+            else if (token[i].endsWith("!")) { new_token.push(token[i].replace(/\!/g, "")); }
+            else { new_token.push(token[i]); }
+          }
+          return new_token;
+        }
+
+        function stopWord (questionArray) {
+          let question = questionArray
+          let stopword = $.ajax({type: "GET", url: "backend/data/filtering/stopword.json", async: false}).responseJSON;
+            let quiestion_stopworded = []
+            for (let i = 0; i < question.length; i++) {
+              for (let j = 0; j < stopword.length; j++) {
+                if (question[i].match(RegExp(stopword[j]), "gi") !== null && question[i].length == stopword[j].length) {
+                  quiestion_stopworded.push(`${question[i]}`)
+                }
+              }
+            }
+            for (let i = 0; i < question.length; i++) {
+              for (let j = 0; j < quiestion_stopworded.length; j++) {
+                remove (question, quiestion_stopworded[j])
+              }
+            }
+            let stopword_finish = question.filter(function(str) { return /\S/.test(str); }); //fungsi menghapus array yg kosong : BENTUK OBJECT
+          return stopword_finish
+        }
+
+        function stemming_0 (split) {
+          var json =  {
+                        "mata" : [ "mata pencaharian", "mata pelajaran", "mata uang", "mata kail" ]
+                      }
+          // double word
+          var stem = []
+          for (var i = 0; i < split.length; i++) {
+            var lihatDepan = i+1
+            for (var j = 0; j < Object.keys(json).length; j++) {
+              if (split[i] == Object.keys(json)[j]) {
+                for (var k = 0; k < json[Object.keys(json)[j]].length; k++) {
+                  var reg = new RegExp(json[Object.keys(json)[j]][k], "g")
+                  var asd = `${split[i]} ${split[lihatDepan]}`
+                  if (asd.match(reg) !== null) {
+                    stem.push(`${split[i]} ${split[lihatDepan]}`)
+                    i++
+                  }
+                }
+              }
+              else { stem.push(split[i]) }
+            }
+          }
+          return stem
+          // ./double word
+        }
+
+        function stemming_1 (stem) {
+          var s = []
+          for (var i = 0; i < stem.length; i++) {
+            // prefiks
+            if (stem[i].startsWith("peng") || stem[i].startsWith("meng") || stem[i].startsWith("ber")) {
+              var l = stem[i].replace(/peng|meng|ber/gi, "")
+              s.push(l)
+            }
+            // ./prefiks
+            // suffiks
+            else if (stem[i].endsWith("nya")) {
+              var l = stem[i].replace(/(nya)/gi, "")
+              s.push(l)
+            }
+            // ./suffiks
+            // konfiks
+            else if (stem[i].startsWith("pel") && stem[i].endsWith("an")) {
+              var l = stem[i].replace(/(pel|an)/gi, "")
+              s.push(l)
+            }
+            else if (stem[i].startsWith("pem") && stem[i].endsWith("an")) {
+              var l = stem[i].replace(/(pem|an)/gi, "")
+              s.push(l)
+            }
+            else if (stem[i].startsWith("pe") && stem[i].endsWith("an")) {
+              var l = stem[i].replace(/(pe|an)/gi, "")
+              s.push(l)
+            }
+            // ./konfiks
+            else {
+              s.push(stem[i])
+            }
+          }
+
+          var splitString = []
+          for (var i = 0; i < s.length; i++) {
+            if (s[i].match(/\s/g)) {
+              var n = s[i].split(" ")
+              for (var j = 0; j < n.length; j++) {
+                splitString.push(n[j])
+              }
+            }
+            else { splitString.push(s[i]) }
+          }
+          return splitString
+        }
+
+        function correction (pesan) {
+      	  let data = $.ajax({type: "GET", url: "backend/data/filtering/correction.json", async: false}).responseJSON;
+      	  for (var i = 0; i < Object.keys(data).length; i++) {
+      	    for (var j = 0; j < Object.values(data)[i].length; j++) {
+      	      for (var k = 0; k < pesan.length; k++) {
+      	        if (Object.values(data)[i][j] == pesan[k]) {
+      	          var index = pesan.indexOf(pesan[k]);
+      	          if (~index) {
+      	              pesan[index] = Object.keys(data)[i];
+      	          }
+      	        }
+      	      }
+      	    }
+      	  }
+      	  return pesan
+      	}
+
+        function lemmatization (pesan) {
+      		let data = $.ajax({type: "GET", url: "backend/data/filtering/lemmatization.json", async: false}).responseJSON;
+      		for (var i = 0; i < Object.keys(data).length; i++) {
+      		  for (var j = 0; j < Object.values(data)[i].length; j++) {
+      		    for (var k = 0; k < pesan.length; k++) {
+      		      if (Object.values(data)[i][j] == pesan[k]) {
+      		        var index = pesan.indexOf(pesan[k]);
+      		        if (~index) {
+      		            pesan[index] = Object.keys(data)[i];
+      		        }
+      		      }
+      		    }
+      		  }
+      		}
+      		return pesan
+      	}
+
+        function analyzing (message, data_lemmatization) {
+          let data = $.ajax({type: "GET", url: "backend/data/question-and-answer/1.pertanyaan.json", async: false}).responseJSON;
+
+          let dataPertanyaan = []
+          for (let i = 0; i < Object.keys(data).length; i++) {
+          	dataPertanyaan.push(Object.values(data)[i][0]);
+          }
+
+          let d = 0
+          let json = []
+          for (let i = 0; i < data_lemmatization.length; i++) {
+          	let regex = new RegExp(data_lemmatization[i],"gi")
+          	for (let j = 0; j < dataPertanyaan.length; j++) {
+          		let asd = dataPertanyaan[j].match(regex)
+          		if (asd !== null) { d = 1 }
+          		else { d = 0 }
+          		json.push(d)
+          	}
+          } // output | [1]
+          let tempArray = _.chunk(json,dataPertanyaan.length)
+          // output | [2]
+
+          let tempMatchPerKata = []
+          for (let i = 0; i < dataPertanyaan.length; i++) {
+          	for (let j = 0; j < tempArray.length; j++) {
+          		let s = tempArray[j][i]
+          		tempMatchPerKata.push(s)
+          	}
+          } // output | [3]
+
+          let tempArrayd = _.chunk(tempMatchPerKata,data_lemmatization.length)
+          // output | [4]
+
+          let fix = []
+          for (let i = 0; i < tempArrayd.length; i++) {
+          	fix.push
+          	({
+          		"id" : i,
+          		"total_match" : tempArrayd[i].filter(i => i === 1).length, //menghitung jumlah per array dari letiabel tempArrayd
+          		"kalimat" : dataPertanyaan[i],
+          		"split_total_kalimat" : dataPertanyaan[i].split(" ").length
+          	})
+          }// output | [5]
+
+          let totalMatch = []
+          for (let i = 0; i < fix.length; i++) {
+          	totalMatch.push(fix[i].total_match)
+          } // array | daftar total match kata pertanyaan dengan seluruh kalimat
+          let max_match_kata = Math.max(...totalMatch) // array | mencari max pada array total match
+
+          if ((max_match_kata <= 1 || data_lemmatization.length <= 1) && message.split(" ").length < 2 || totalMatch.length == 0) {
+          	return responseData = {
+          		"status": `error`,
+          		"data": [`Mohon maaf, maksud dari pertanyaan <b>"${message}"</b> apa ya ? <br>kokok-Bot tidak memahami <b>pertanyaan</b> yang kamu cari.<br><b>Ulangi pertanyaanmu lagi.</b>`],
+          	}
+          }
+          // Ku response
+          let ku_response = ["saya juga pusing nih", "mmmh.. apa? yah hehe", "apa? padahal udah 2024 masa ga tau?"]
+
+          for (var i = 0; i < data_lemmatization.length; i++) {
+            if (data_lemmatization[i].endsWith("ku")) {
+              let random = getRandomInt(ku_response.length)
+              return responseData = {
+            		"status": `error`,
+            		"data": [`${ku_response[random]}`],
+            	}
+            }
+          }
+          // ./Ku response
+
+          // Seleksi kecocokan per kata pertanyaan pengguna dengan kata didatabase
+          let fix2 = []
+          let lowestSplit = []
+          let allKalimat = []
+          for (let i = 0; i < fix.length; i++) {
+          	if (fix[i].total_match == max_match_kata) {
+          		fix2.push
+          		({
+          			"id" : fix[i].id,
+          			"total_match" : fix[i].total_match,
+          			"kalimat" : fix[i].kalimat,
+          			"split_total_kalimat" : fix[i].split_total_kalimat
+          		})
+          		allKalimat.push(fix[i].kalimat)
+          		lowestSplit.push(fix[i].split_total_kalimat)
+          	}
+          }
+
+          let lowest_split = Math.min(...lowestSplit) // array | mencari max pada array total match
+
+          let no = 0
+          let fix3 = []
+          let qwe = []
+          let valuesQuestion = [];
+          for (let i = 0; i < fix2.length; i++) {
+          	if (fix2[i].split_total_kalimat == lowest_split) {
+          		no++
+          		fix3.push
+          		({
+          			"id" : fix2[i].id,
+          			"total_match" : fix2[i].total_match,
+          			"kalimat" : fix2[i].kalimat,
+          			"split_total_kalimat" : fix2[i].split_total_kalimat
+          		})
+          		qwe.push(fix2[i].kalimat)
+          		valuesQuestion.push(`<br>${no}. <b><a id='salin-pertanyaan'>${fix2[i].kalimat}</a></b>`)
+          	}
+          }
+
+          if (valuesQuestion.length > 1 || max_match_kata < 2) {
+          	let replaceArrayQuestionToSuggest = JSON.stringify(valuesQuestion).replace(/[\[\]",]/g, "")
+          	return responseData = {
+          		"status": `error`,
+          		"data": {
+          			"arg1": [`Mohon maaf, maksud dari pertanyaan <b>"${message}"</b> apa ya ? <br>Kami tidak memahami <b>pertanyaan</b> yang kamu cari.`],
+          			"arg2": [`Mungkin <b>kata kunci</b> yang kamu cari ada disini: ${replaceArrayQuestionToSuggest}`]
+          		}
+          	}
+          }
+
+          let keysQuestion = [];
+          let suggestQuestion = [];
+          for (let i = 0; i < Object.values(data).length; i++) {
+          	for (let j = 0; j < qwe.length; j++) {
+          		if (Object.values(data)[i][0] == qwe[j]) {
+          			keysQuestion.push(Object.keys(data)[i]);
+          		}
+          	}
+          }
+
+          if (keysQuestion.length > 1) {
+          	let replaceArrayQuestionToSuggest = JSON.stringify(valuesQuestion).replace(/[\[\]",]/g, "")
+          	return responseData = {
+          		"status": `error`,
+          		"data": {
+          			"arg1": [`Mohon maaf, maksud dari pertanyaan <b>"${message}"</b> apa ya ? <br>Kami tidak memahami <b>pertanyaan</b> yang kamu cari.`],
+          			"arg2": [`Mungkin <b>kata kunci</b> yang kamu cari ada disini: ${replaceArrayQuestionToSuggest}`]
+          		}
+          	}
+          }
+          else {
+          	let data_pertanyaan_grup = $.ajax({type: "GET", url: "backend/data/question-and-answer/2.pertanyaan_grup.json", async: false}).responseJSON;
+
+          	let eh = []
+          	for (let i = 0; i < Object.keys(data_pertanyaan_grup).length; i++) {
+          		if (keysQuestion[0] == Object.keys(data_pertanyaan_grup)[i]) {
+          			let random = getRandomInt(Object.values(data_pertanyaan_grup)[i].length)
+          			var get_random_answer = Object.values(data_pertanyaan_grup)[i][random]
+          			eh.push(get_random_answer)
+          		}
+          	}
+          	return responseData = {
+          		"status": `success`,
+          		"data": {
+          			"arg1": [`${get_random_answer}`]
+          		}
+          	}
+          }
+        }
+        // ./filtering
+
+        function start () {
+          return setTimeout(function(){
+            $('#chat-sending').removeClass('disabled');
+            $('#chat-typing').val(null);
+            $('.load-chat').hide();
+            $('#conversation').append(`
+              <div class="row message-body">
+                <div class="col-sm-12 message-main-receiver">
+                  <div class="receiver">
+                    <div class="message-text">
+                      Selamat datang di <b>Bot kokok</b>, Ga kerasa sekarang udah 2024. Mau tanya apa nih seputar informasi dariku?
+                    </div>
+                    <span class="message-time pull-right">
+                      ${minuteAndSecond} ${abbreviation}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            `);
+            $('#conversation').append(`
+              <div class="row message-body">
+                <div class="col-sm-12 message-main-receiver">
+                  <div class="receiver">
+                    <div class="message-text">
+                      Ayo terus tanyakan dengan pertanyaan yang sama. Jawaban sistem tidak hanya satu lho.. ;)
+                    </div>
+                    <span class="message-time pull-right">
+                      ${minuteAndSecond} ${abbreviation}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            `);
+          },800);
+        }
+
+        $(document).on('click', '#salin-pertanyaan', function () {
+          var a = $(this).html()
+          $('#chat-typing').val(a)
+          $("#chat-typing").focus();
+        })
+
+        function escape_special_character (parse) {
+          let s = []
+          for (var i = 0; i < parse.length; i++) {
+          	var asd = parse[i].replace(/[^a-zA-Z\s0-9']+/g,'');
+          	s.push(asd)
+          }
+          return s
+        }
+
+        function remove (array, element) {
+          const index = array.indexOf(element);
+          if (index !== -1) {
+            array.splice(index, 1);
+          }
+        }
+
+        function getRandomInt(max) {
+          return Math.floor(Math.random() * Math.floor(max));
+        }
+
+      })
+    </script>
+  </body>
+</html>

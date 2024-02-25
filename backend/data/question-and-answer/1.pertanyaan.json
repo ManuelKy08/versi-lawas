@@ -1,0 +1,15 @@
+{
+  "nama_siapa": ["nama lengkap"],
+  "panggilan": ["nama panggilan"],
+  "alamat_rumah": ["alamat rumah"],
+  "agama_anut": ["agama yang di anut"],
+  "status_sekarang": ["status sekarang"],
+  "hobi_kegemaran": ["hobi kegemaran"],
+  "nama_adik": ["nama adik"],
+  "kuliah_mana": ["kuliah dimana"],
+  "lahir_dimana": ["lahir dimana"],
+  "kapan_nikah": ["kapan nikah"],
+  "ciri_jodoh": ["ciri jodoh"],
+  "pemrograman_favorit": ["bahasa pemrograman favorit"],
+  "pacar": ["pacarnya siapa"]
+}
